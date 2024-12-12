@@ -11,7 +11,9 @@
                    VerticalOptions="Start" />
 
             <ScrollView VerticalOptions="FillAndExpand">
-                <StackLayout x:Name="responseContainer">
+                <StackLayout x:Name="responseContainer" BackgroundColor="Grey">
+                   
+
 
                 </StackLayout>
             </ScrollView>
@@ -41,6 +43,10 @@
                     FontSize="18"
                     HorizontalOptions="Center"
                    VerticalOptions="End" />
+
+            <Button Text="show word"  FontSize="18"
+ BackgroundColor="LightGreen"
+ TextColor="white" Clicked="OnShowWordClicked" />
 
         </StackLayout>
     </ContentPage.Content>

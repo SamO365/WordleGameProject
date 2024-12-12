@@ -32,11 +32,19 @@ namespace WordleGameProject
 
                 if (!File.Exists(filePath))
                 {
-                    using (HttpClient client = new HttpClient())
+                    try
                     {
-                        var content = await client.GetStringAsync(website);
-                        await File.WriteAllTextAsync(filePath, content);
+                        using (HttpClient client = new HttpClient())
+                        {
+                            var content = await client.GetStringAsync(website);
+                            await File.WriteAllTextAsync(filePath, content);
+                        }
                     }
+                    catch (Exception ex) 
+                    {
+                        Console.WriteLine($"Error downloading word list: {ex.Message}");
+                        throw new Exception("Unable to download the word list. Please try again later.");
+                    }//
                 }
 
                 string[] words = await File.ReadAllLinesAsync(filePath);
@@ -146,13 +154,21 @@ namespace WordleGameProject
 
         private void OnSubmitGuessClicked(object sender, EventArgs e)
         {
-            string guess = $"{L1.Text}{L2.Text}{L3.Text}{L4.Text}{L5.Text}".ToUpper();
+            string guess = $"{L1.Text}{L2.Text}{L3.Text}{L4.Text}{L5.Text}".ToLower();
 
             if (string.IsNullOrEmpty(guess) || guess.Length != 5)
             {
                 DisplayAlert("Error", "Please enter a valid 5-letter word.", "OK");
                 return;
             }
+
+            
+
+            if (!wordList.Contains(guess))
+            {
+                DisplayAlert("Error", "The word is not in the word list!", "Ok");
+                return;
+            }//
 
             var (response, isRight) = currentGame.SubmitGuess(guess);
 
@@ -162,7 +178,6 @@ namespace WordleGameProject
                 FontSize = 18,
                 TextColor = isRight ? Colors.Green : Colors.Black
             });
-
             if (isRight)
             {
                 DisplayAlert("Congratulations!", "You guessed the word!", "OK");
@@ -171,6 +186,7 @@ namespace WordleGameProject
             else if (currentGame.attempts == 0)
             {
                 DisplayAlert("Game Over", $"The word was: {currentGame.chosenWord}", "OK");
+
                 StartNewGame();
             }
 
@@ -188,6 +204,11 @@ namespace WordleGameProject
         private void UpdateAttemptsLabel()
         {
             AttemptsLabel.Text = $"Attempts Left: {currentGame.attempts}";
+        }
+
+        private void OnShowWordClicked(object sender, EventArgs e)
+        {
+            DisplayAlert("Chosen word", $"The chosen word is: {currentGame.chosenWord}", "Ok");
         }
 
         private void OnNewGameClicked(object sender, EventArgs e)
