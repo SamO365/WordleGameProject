@@ -1,14 +1,26 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="WordleGameProject.MainPage">
+             x:Class="WordleGameProject.MainPage"
+             Title="Wordle" Background="DarkOrange">
+
 
     <ContentPage.Content>
         <StackLayout Padding="20" Spacing="10">
-            <Label Text="Wordle Game"
-                   FontSize="30"
+            <Label Text="Use Tab or Tab the next box to move on!"
+                   FontSize="16"
                    HorizontalOptions="Center"
                    VerticalOptions="Start" />
+
+            <StackLayout>
+            <Label x:Name="TimerLabel"
+               Text="00:00"
+               FontSize="36"
+               VerticalOptions="Center"
+               HorizontalOptions="Center"/>
+                
+            </StackLayout>
+
 
             <ScrollView VerticalOptions="FillAndExpand">
                 <StackLayout x:Name="responseContainer" BackgroundColor="Grey">

@@ -2,6 +2,10 @@
 using System.IO;
 using System;
 using System.Text.Json;
+using System.Diagnostics;
+
+
+
 
 namespace WordleGameProject
 {
@@ -9,10 +13,15 @@ namespace WordleGameProject
     {
         private wordleGame currentGame;
         private List<string> wordList;
+        private Stopwatch _stopwatch;
+        private bool GameStarted = false;
+
         public MainPage()
         {
             InitializeComponent();
             LoadGameAsync();
+            _stopwatch = new Stopwatch();
+            Device.StartTimer(TimeSpan.FromMilliseconds(1000), UpdateTimerLabel);
         }
 
 
@@ -30,6 +39,7 @@ namespace WordleGameProject
             {
                 string filePath = Path.Combine(FileSystem.AppDataDirectory, file);
 
+                // it will try and run this
                 if (!File.Exists(filePath))
                 {
                     try
@@ -40,6 +50,7 @@ namespace WordleGameProject
                             await File.WriteAllTextAsync(filePath, content);
                         }
                     }
+                    // if it doesnt work it will throw back an error message rather than breaking the code
                     catch (Exception ex) 
                     {
                         Console.WriteLine($"Error downloading word list: {ex.Message}");
@@ -135,7 +146,7 @@ namespace WordleGameProject
                 public string chosenWord { get; set; }
                 public int attempts { get; set; }
                 public string gameGrid { get; set; }
-                public DateTime Timestamp { get; set; }
+               
             }
         }
 
@@ -150,7 +161,21 @@ namespace WordleGameProject
             currentGame = new wordleGame(wordList);
             responseContainer.Children.Clear();
             UpdateAttemptsLabel();
+
+            _stopwatch.Reset();
+            _stopwatch.Start();
+            GameStarted = true;
         }
+
+        private bool UpdateTimerLabel()
+        {
+            if (GameStarted)
+            {
+                TimerLabel.Text = _stopwatch.Elapsed.ToString(@"mm\:ss");
+            }
+            return true;// keeps the timer alive while the game is running 
+        }
+
 
         private void OnSubmitGuessClicked(object sender, EventArgs e)
         {
@@ -160,15 +185,14 @@ namespace WordleGameProject
             {
                 DisplayAlert("Error", "Please enter a valid 5-letter word.", "OK");
                 return;
-            }
-
+            }// ensures players word in atleast 5 letters
             
 
             if (!wordList.Contains(guess))
             {
                 DisplayAlert("Error", "The word is not in the word list!", "Ok");
                 return;
-            }//
+            }// ensures that player enters a real word
 
             var (response, isRight) = currentGame.SubmitGuess(guess);
 
@@ -216,4 +240,6 @@ namespace WordleGameProject
             StartNewGame();
         }
     }
+
+   
 }
